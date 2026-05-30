@@ -59,7 +59,7 @@ java -version
 ## Структура проекта
 
 ```text
-chromatin-structure-function-course/
+OMICS_course_spring_2026/
 ├── README.md
 ├── data/
 │   ├── raw/
