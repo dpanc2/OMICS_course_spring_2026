@@ -1,0 +1,32 @@
+# Large local data files
+data/raw/*
+data/trimmed/*
+data/reference/*
+data/juicer/*
+results/hic/*
+
+# Reports generated during practical work
+results/fastqc_raw/*
+results/fastqc_trimmed/*
+
+# Keep directory placeholders
+!.gitkeep
+!*/.gitkeep
+
+# Python/Jupyter
+.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+
+# macOS
+.DS_Store
+
+# Conda/env files
+.env
+.venv/
+env/
+venv/
+
+# Juicer and visualization tools
+tools/*.jar
+tools/juicer/
