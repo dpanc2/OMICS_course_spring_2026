@@ -30,6 +30,8 @@
 - `hic2cool`
 - `cooler`
 - `cooltools`
+- `requests`
+- `tqdm`
 - Java 8 или новее
 - Juicer tools
 
@@ -37,7 +39,7 @@
 
 ```bash
 conda create -n hic_practice -c conda-forge -c bioconda \
-  fastqc cutadapt bwa samtools hic2cool cooler cooltools openjdk=11 wget
+  fastqc cutadapt bwa samtools hic2cool cooler cooltools requests tqdm openjdk=11 wget
 conda activate hic_practice
 ```
 
@@ -50,6 +52,7 @@ bwa 2>&1 | head
 samtools --version
 python -m hic2cool --help
 cooler --version
+python -c "import requests, tqdm"
 java -version
 ```
 
@@ -245,34 +248,38 @@ mkdir -p results/hic
 cp data/juicer/MoPh7/aligned/inter.hic results/hic/MoPh7.inter.hic
 ```
 
-## Шаг 8. Конвертация `.hic` в `.mcool` и балансировка
+## Шаг 8. Загрузка готовых карт, конвертация `.hic` в `.mcool` и балансировка
 
 Juicebox работает с `.hic`, а библиотеки `cooler` и `cooltools` работают с форматами
-`.cool` и `.mcool`. Поэтому после Juicer конвертируем карту в multi-resolution cooler:
+`.cool` и `.mcool`. Поэтому готовые карты или результат Juicer нужно конвертировать в
+multi-resolution cooler и сбалансировать.
 
 ```bash
-python -m hic2cool convert \
-  results/hic/MoPh7.inter.hic \
-  data/MoPh7.inter.mcool \
-  -r 0
+python scripts/download_data.py \
+  --hic results/hic/MoPh7.inter.hic \
+  --data-dir data \
+  --nproc 4
 ```
 
-Параметр `-r 0` означает, что `hic2cool` сохранит все доступные разрешения из `.hic`
-в один multi-resolution файл `.mcool`.
+Скрипт `scripts/download_data.py` делает три вещи:
+
+- скачивает `.hic` файлы по URL или берет локальный `.hic`;
+- конвертирует `.hic` в `.mcool` через `hic2cool`;
+- запускает `cooler balance` для всех разрешений внутри `.mcool`.
+
+Если нужно скачать готовые карты по ссылкам, передайте URL:
+
+```bash
+python scripts/download_data.py \
+  --url https://example.org/path/to/sample.hic \
+  --data-dir data \
+  --nproc 4
+```
 
 Проверим, какие разрешения появились:
 
 ```bash
 cooler ls data/MoPh7.inter.mcool
-```
-
-Для анализа в `cooltools` нужна сбалансированная матрица, то есть в cooler-файле
-должна появиться колонка `weight`. Сбалансируем все разрешения внутри `.mcool`:
-
-```bash
-while read uri; do
-  cooler balance --force "$uri"
-done < <(cooler ls data/MoPh7.inter.mcool)
 ```
 
 Проверим одно разрешение:
