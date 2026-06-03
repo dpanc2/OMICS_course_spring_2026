@@ -47,22 +47,22 @@ conda activate hic_practice
 ```bash
 fastqc --version
 cutadapt --version
-bwa 2>&1 | head
+bwa 2>&1 | head -3
 samtools --version
-python -m hic2cool --help
+python3 -m hic2cool --help
 cooler --version
-python -c "import requests, tqdm"
+python3 -c "import requests, tqdm"
 java -version
 ```
 
 ## Шаг 1. Скачиваем сырые риды
 
-В этой практике используются paired-end риды:
+В практике 1го дня используются paired-end риды
 
 - `Copy of MoPh7_S85_L001_R1_001.fastq.gz`
 - `Copy of MoPh7_S85_L001_R2_001.fastq.gz`
 
-Скачаем их в `data/raw/` и сразу дадим короткие имена без пробелов:
+Скачаем их в `data/raw/`
 
 ```bash
 wget -O data/raw/MoPh7_R1.fastq.gz \
@@ -72,13 +72,13 @@ wget -O data/raw/MoPh7_R2.fastq.gz \
   "https://genedev.bionet.nsc.ru/ftp/_RawReads/2025-05-23MyGenetics/Copy%20of%20MoPh7_S85_L001_R2_001.fastq.gz"
 ```
 
-Проверим, что файлы скачались:
+Проверим, что файлы скачались
 
 ```bash
 ls -lh data/raw/
 ```
 
-## Шаг 2. Первичный контроль качества FastQC
+## Шаг 2. FastQC
 
 Запустим FastQC для обоих файлов:
 
@@ -123,40 +123,39 @@ cutadapt \
 - `-p` задает файл для второго рида.
 
 
-## Шаг 4. Установка Juicer tools
+## Шаг 4. Установка Juicer
 
 Официальный репозиторий Juicer:
 <https://github.com/aidenlab/juicer>
 
-Для локальной практики нам нужен `juicer_tools.jar`.
+Скачаем Juicer целиком в папку `tools/`:
 
 ```bash
 mkdir -p tools
-wget -O tools/juicer_tools.jar \
-  https://github.com/aidenlab/Juicebox/releases/download/v2.20.00/juicer_tools.2.20.00.jar
+git clone https://github.com/aidenlab/juicer.git tools/juicer
 ```
 
 Проверка:
 
 ```bash
-java -jar tools/juicer_tools.jar
+ls tools/juicer/CPU/juicer.sh
 ```
 
-Если команда выводит справку Juicer tools, установка прошла успешно
+Если команда показывает путь к `juicer.sh`, установка прошла успешно.
 
-## Шаг 5. Подготовить геномный референс
+## Шаг 5. Референсный геном
 
-Для полноценного запуска Juicer нужны:
+Для запуска Juicer нам нужны
 
-- FASTA референсного генома;
-- индекс `bwa`;
-- файл размеров хромосом;
-- файл сайтов рестрикции для выбранного фермента.
+- fasta референсного генома
+- индекс `bwa`
+- файл размеров хромосом `chrom.sizes`
+- файл сайтов рестрикции для выбранного фермента
 
-Работаем с T2T референсом человека:
+В качестве референса берем T2T геном человека:
 
 ```bash
-# FASTA кладем в data/reference/genome.fa
+# кладем в data/reference/
 wget -O data/references/T2T_human.fna https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/914/755/GCF_009914755.1_T2T-CHM13v2.0/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna.gz 
 
 bwa index data/references/T2T_human.fna
@@ -165,7 +164,7 @@ samtools faidx data/references/T2T_human.fna
 cut -f1,2 data/references/T2T_human.fna.fai > data/references/chrom.sizes
 ```
 
-## Шаг 6. Подготовить структуру для Juicer
+## Шаг 6. Подготовка к запуску Juicer
 
 Juicer ожидает определенную структуру директорий. Для одного образца можно сделать так:
 
@@ -177,18 +176,6 @@ ln -s ../../trimmed/MoPh7_R1.trimmed.fastq.gz \
 
 ln -s ../../trimmed/MoPh7_R2.trimmed.fastq.gz \
   data/juicer/MoPh7/fastq/MoPh7_R2.fastq.gz
-```
-
-Если Juicer установлен из GitHub-репозитория:
-
-```bash
-git clone https://github.com/aidenlab/juicer.git tools/juicer
-```
-
-Основной shell-пайплайн находится в:
-
-```text
-tools/juicer/CPU/juicer.sh
 ```
 
 Файл сайтов рестрикции обычно готовится скриптами из Juicer. В реальном анализе нужно
@@ -247,47 +234,7 @@ mkdir -p results/hic
 cp data/juicer/MoPh7/aligned/inter.hic results/hic/MoPh7.inter.hic
 ```
 
-## Шаг 8. Загрузка готовых карт, конвертация `.hic` в `.mcool` и балансировка
-
-Juicebox работает с `.hic`, а библиотеки `cooler` и `cooltools` работают с форматами
-`.cool` и `.mcool`. Поэтому готовые карты или результат Juicer нужно конвертировать в
-multi-resolution cooler и сбалансировать.
-
-```bash
-python scripts/download_data.py \
-  --hic results/hic/MoPh7.inter.hic \
-  --data-dir data \
-  --nproc 4
-```
-
-Скрипт `scripts/download_data.py` делает три вещи:
-
-- скачивает `.hic` файлы по URL или берет локальный `.hic`;
-- конвертирует `.hic` в `.mcool` через `hic2cool`;
-- запускает `cooler balance` для всех разрешений внутри `.mcool`.
-
-Если нужно скачать готовые карты по ссылкам, передайте URL:
-
-```bash
-python scripts/download_data.py \
-  --url https://example.org/path/to/sample.hic \
-  --data-dir data \
-  --nproc 4
-```
-
-Проверим, какие разрешения появились:
-
-```bash
-cooler ls data/MoPh7.inter.mcool
-```
-
-Проверим одно разрешение:
-
-```bash
-cooler info data/MoPh7.inter.mcool::/resolutions/1000000
-```
-
-## Шаг 9. Установка Juicebox для визуализации
+## Шаг 8. Установка Juicebox для визуализации
 
 Juicebox нужен для интерактивного просмотра `.hic` карт.
 
@@ -301,7 +248,7 @@ wget -O tools/Juicebox.jar \
   https://github.com/aidenlab/Juicebox/releases/download/v2.20.00/Juicebox.jar
 ```
 
-Запуск:
+Запуск
 
 ```bash
 java -jar tools/Juicebox.jar
@@ -315,30 +262,65 @@ java -jar tools/Juicebox.jar
 4. менять разрешение карты;
 5. сравнить вид сырой и нормализованной матрицы, если нормализация доступна.
 
-Далее для практики мы будем использовать те же карты, только более глубокие
-для них было выровнено большее количество ридов на референс.
-
-Для загрузки используем скрипт:
-
-```text
-scripts/download_data.py
-```
-
-Что делает скрипт:
-
-- скачивает `.hic` файлы из списка `URLS` в папку `data/`;
-- конвертирует каждый `.hic` в multi-resolution `.mcool`;
-- балансирует все разрешения внутри `.mcool` с помощью `cooler balance`.
-
-После завершения в папке `data/` должны появиться пары файлов:
-
-```text
-data/*_inter_30.hic
-data/*Control*_inter_30.mcool
-```
-
 Проверить список разрешений внутри `.mcool` можно так:
 
 ```bash
 cooler ls data/Control_inter_30.mcool
 ```
+
+
+# Задание первого дня
+
+Напишите bash-pipeline для обработки нескольких Hi-C образцов от сырых paired-end
+ридов до `.hic` файлов
+
+### Входные данные
+
+Общая папка с сырыми ридами:
+
+```text
+https://genedev.bionet.nsc.ru/ftp/_RawReads/2025-05-23MyGenetics/
+```
+
+Для самостоятельной обработки используйте три дополнительных образца:
+
+| Образец | R1 | R2 |
+| --- | --- | --- |
+| `MoPh11` | `Copy of MoPh11_S86_L001_R1_001.fastq.gz` | `Copy of MoPh11_S86_L001_R2_001.fastq.gz` |
+| `MoPh14` | `Copy of MoPh14_S87_L001_R1_001.fastq.gz` | `Copy of MoPh14_S87_L001_R2_001.fastq.gz` |
+| `MoPh15` | `Copy of MoPh15_S88_L001_R1_001.fastq.gz` | `Copy of MoPh15_S88_L001_R2_001.fastq.gz` |
+
+Образец `MoPh7`, разобранный в практике, можно использовать как пример и контроль
+для структуры директорий и команд.
+
+### Что должен делать пайплайн
+
+Для каждого образца:
+
+1. Скачать paired-end FASTQ файлы в `data/raw/`.
+2. Запустить `FastQC` для сырых ридов.
+3. Обрезать адаптеры и низкокачественные хвосты с помощью `cutadapt`.
+4. Подготовить директорию `data/juicer/<sample>/fastq/`.
+5. Запустить `Juicer` и получить файл `inter_30.hic`.
+6. Скопировать итоговую карту в `results/hic/<sample>.inter_30.hic`.
+
+### Ожидаемый результат
+
+В конце работы пайплайна должны появиться `30.hic` файлы для четырех образцов:
+
+```text
+results/hic/MoPh7.inter.hic
+results/hic/MoPh11.inter.hic
+results/hic/MoPh14.inter.hic
+results/hic/MoPh15.inter.hic
+```
+
+### Финальный вопрос
+
+После получения карт сравните четыре образца между собой в Juicebox:
+
+- отличаются ли карты визуально
+- есть ли крупные перестройки
+- на каких хромосомах они заметны
+- какие дополнительные проверки нужны, чтобы убедиться, что это не артефакт
+  покрытия, качества ридов или выравнивания
