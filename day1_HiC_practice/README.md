@@ -231,10 +231,10 @@ Juicer ожидает определенную структуру директо
 ```bash
 mkdir -p data/juicer/MoPh7/fastq
 
-ln -s ../../../trimmed/MoPh7_R1.trimmed.fastq.gz \
+ln -s "$(pwd)/data/trimmed/MoPh7_R1.trimmed.fastq.gz" \
   data/juicer/MoPh7/fastq/MoPh7_R1.fastq.gz
 
-ln -s ../../../trimmed/MoPh7_R2.trimmed.fastq.gz \
+ln -s "$(pwd)/data/trimmed/MoPh7_R2.trimmed.fastq.gz" \
   data/juicer/MoPh7/fastq/MoPh7_R2.fastq.gz
 ```
 
