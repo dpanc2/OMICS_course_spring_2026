@@ -9,10 +9,10 @@ from hic2cool.hic2cool_utils import hic2cool_convert
 
 # URLs for Hi-C maps
 URLS = [
-    "https://genedev.bionet.nsc.ru/ftp/by_User/DashaPanchenko/OMICS_course_spring_2026/day1/data/MoPh11_enr_v2.hic",
+    "https://genedev.bionet.nsc.ru/ftp/by_User/DashaPanchenko/OMICS_course_spring_2026/day1/data/MoPh7_enr_v2.hic",
     "https://genedev.bionet.nsc.ru/ftp/by_User/DashaPanchenko/OMICS_course_spring_2026/day1/data/MoPh14_enr_v2.hic",
     "https://genedev.bionet.nsc.ru/ftp/by_User/DashaPanchenko/OMICS_course_spring_2026/day1/data/MoPh15_enr_v2.hic",
-    "https://genedev.bionet.nsc.ru/ftp/by_User/DashaPanchenko/OMICS_course_spring_2026/day1/data/MoPh7_enr_v2.hic"
+    "https://genedev.bionet.nsc.ru/ftp/by_User/DashaPanchenko/OMICS_course_spring_2026/day1/data/MoPh11_enr_v2.hic"
 ]
 
 DATA_DIR = "data"

@@ -6,6 +6,7 @@
 **/data/*.hic
 **/data/*.cool
 **/data/*.mcool
+**/data/gc_track_*.tsv
 **/results/hic/*
 **/results/compartments/*
 

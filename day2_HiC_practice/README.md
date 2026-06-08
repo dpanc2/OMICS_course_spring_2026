@@ -1,6 +1,6 @@
 # День 2. Анализ готовых Hi-C карт
 
-Во второй день мы работаем не с сырыми ридами, а с уже собранными Hi-C картами.
+Во второй день мы работаем не с сырыми ридами, а с уже собранными Hi-C картами
 
 Цель практики:
 
@@ -13,22 +13,22 @@
 - посчитать A/B-компартменты и saddle plots
 - сохранить E1-компартментный трек в `bedGraph` и `bigWig`
 
-## 1. Перейти в папку практики
+## 1. Переходим в папку практики
 
 ```bash
 cd ~/OMICS_course_spring_2026/day2_HiC_practice
 ```
 
-## 2. Активировать окружение
+## 2. Активируем окружение
 
-Если вы продолжаете работать в окружении с первого дня, можно использовать его.
-Главное, чтобы были установлены Python-библиотеки:
+Можно использовать окружении с первого дня, главное, чтобы были установлены python-библиотеки:
 
 - `cooler`
 - `cooltools`
 - `hic2cool`
 - `bioframe`
 - `pyBigWig`
+- `pysam`
 - `jupyter`
 - `matplotlib`
 - `seaborn`
@@ -37,10 +37,10 @@ cd ~/OMICS_course_spring_2026/day2_HiC_practice
 
 ```bash
 conda activate hic_practice
-conda install cooler cooltools hic2cool bioframe pybigwig
+conda install cooler cooltools hic2cool bioframe pybigwig pysam
 ```
 
-## 3. Скачать и подготовить карты
+## 3. Скачиваем и подготавливаем карты
 
 Запускаем скрипт из папкт второго дня (скачиваем новые данные)
 
@@ -64,7 +64,7 @@ python3 scripts/download_data.py
 Если файлы уже существуют, скрипт не скачивает их заново.
 Если разрешение уже сбалансировано, скрипт тоже пропускает этот шаг.
 
-## 4. Проверить результат
+## 4. Проверим результат
 
 Посмотрим, какие разрешения есть в `.mcool` файле:
 
@@ -80,7 +80,7 @@ python3 -m cooler info data/MoPh7_enr_v2.mcool::/resolutions/100000
 
 Если в таблице bins есть колонка `weight`, значит карта сбалансирована.
 
-## 5. Открыть ноутбуки
+## 5. Открываем ноутбуки
 
 Порядок работы:
 
@@ -89,11 +89,12 @@ python3 -m cooler info data/MoPh7_enr_v2.mcool::/resolutions/100000
 3. `insulation_and_boundaries.ipynb` Инсуляция
 4. `compartments_and_saddles.ipynb` А/В компартментализация
 
-В конце ноутбук `compartments_and_saddles.ipynb` сохраняет E1-треки для всех образцов:
+В конце ноутбук `compartments_and_saddles.ipynb` сохраняет E1-треки для всех образцов
 
 ```text
 results/compartments/*_E1_res100000.bedGraph
 results/compartments/*_E1_res100000.bw
+```
 
 ## 6. Можно проверить `.hic` в Juicebox
 
