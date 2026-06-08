@@ -3,7 +3,11 @@
 **/data/trimmed/*
 **/data/reference/*
 **/data/juicer/*
+**/data/*.hic
+**/data/*.cool
+**/data/*.mcool
 **/results/hic/*
+**/results/compartments/*
 
 # Reports generated during practical work
 **/results/fastqc_raw/*
