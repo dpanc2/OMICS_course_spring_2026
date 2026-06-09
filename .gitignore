@@ -7,8 +7,15 @@
 **/data/*.cool
 **/data/*.mcool
 **/data/gc_track_*.tsv
+**/data/raw/**/*.fq.gz
+**/data/raw/**/*.fastq.gz
+**/data/reference/star_index/*
 **/results/hic/*
 **/results/compartments/*
+**/results/star/*
+**/results/bwa/*
+**/results/tracks/*
+**/results/logs/*
 
 # Reports generated during practical work
 **/results/fastqc_raw/*
