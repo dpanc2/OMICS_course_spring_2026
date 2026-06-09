@@ -16,6 +16,9 @@
 **/results/bwa/*
 **/results/tracks/*
 **/results/logs/*
+**/results/alignments/*
+**/results/macs/*
+**/tracks/*
 
 # Reports generated during practical work
 **/results/fastqc_raw/*
