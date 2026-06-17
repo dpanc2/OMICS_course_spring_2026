@@ -1,0 +1,11 @@
+jupyter
+pandas
+numpy
+matplotlib
+seaborn
+pysam
+pyBigWig
+pyranges
+scipy
+statsmodels
+tqdm

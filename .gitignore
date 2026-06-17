@@ -45,3 +45,5 @@ venv/
 # Juicer and visualization tools
 **/tools/*.jar
 **/tools/juicer/
+
+day4_WGBS_practice/scripts/prepare_bismark_inputs.py
